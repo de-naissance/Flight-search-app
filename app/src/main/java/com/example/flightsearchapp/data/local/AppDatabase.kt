@@ -16,15 +16,21 @@ import androidx.room.RoomDatabase
 abstract class AppDatabase : RoomDatabase() {
     abstract fun airportDao(): AirportDao
     abstract fun favoriteDao(): FavoriteDao
-    @Volatile
-    private var Instance: AppDatabase? = null
+    companion object {
+        @Volatile
+        private var Instance: AppDatabase? = null
 
-    fun getDatabase(context: Context): AppDatabase {
-        // если экземпляр не равен null, верните его, или создайте новый экземпляр базы данных.
-        return Instance ?: synchronized(this) {
-            Room.databaseBuilder(context, AppDatabase::class.java, "app_database")
-                .build()
-                .also { Instance = it }
+        fun getDatabase(context: Context): AppDatabase {
+            // если экземпляр не равен null, верните его, или создайте новый экземпляр базы данных.
+            return Instance ?: synchronized(this) {
+                Room.databaseBuilder(context, AppDatabase::class.java, "app_database")
+                    .createFromAsset("database/flight_search.db")
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also {
+                        Instance = it
+                    }
+            }
         }
     }
 }
