@@ -32,7 +32,7 @@ interface AppRepository {
     /**
      * Удалить элемент из источника данных
      */
-    suspend fun deleteFlights(flights: Flights)
+    suspend fun deleteFlights()
 
     suspend fun deleteFavorite(favorite: Favorite)
     /**

@@ -8,6 +8,9 @@ interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(favorite: Favorite)
 
+    /**
+     * Очищаем таблицу перед заполнением
+     */
     @Delete
     suspend fun delete(favorite: Favorite)
 

@@ -4,12 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import com.example.flightsearchapp.data.local.flights.Flights
+import kotlinx.coroutines.flow.*
+import kotlin.random.Random
 
-class HomeViewModel(appRepository: AppRepository) : ViewModel() {
+class HomeViewModel(
+    private val appRepository: AppRepository
+) : ViewModel() {
     val homeUiState: StateFlow<HomeUiState> =
         appRepository.getAllAirportStream().map { HomeUiState(it) }
             .stateIn(
@@ -18,6 +19,18 @@ class HomeViewModel(appRepository: AppRepository) : ViewModel() {
                 initialValue = HomeUiState()
             )
 
+    /**
+     * Очищает, а затем заполняет таблицу случайными рейсами*/
+    suspend fun flightsGeneration() {
+        appRepository.getAllAirportStream().toList().random()
+        appRepository.insertFlights(
+            Flights(
+                departureCode = "SIUUU",
+                destinationCode = "СИУУУУУУУУУУУУ"
+            )
+        )
+
+    }
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
