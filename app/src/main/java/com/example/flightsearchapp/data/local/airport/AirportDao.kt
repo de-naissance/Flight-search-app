@@ -1,4 +1,4 @@
-package com.example.flightsearchapp.data.local
+package com.example.flightsearchapp.data.local.airport
 
 import androidx.room.Dao
 import androidx.room.Query

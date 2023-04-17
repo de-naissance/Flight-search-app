@@ -1,4 +1,4 @@
-package com.example.flightsearchapp.data.local
+package com.example.flightsearchapp.data.local.favorite
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

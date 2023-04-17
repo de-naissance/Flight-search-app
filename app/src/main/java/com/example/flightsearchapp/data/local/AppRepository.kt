@@ -1,5 +1,8 @@
 package com.example.flightsearchapp.data.local
 
+import com.example.flightsearchapp.data.local.airport.Airport
+import com.example.flightsearchapp.data.local.favorite.Favorite
+import com.example.flightsearchapp.data.local.flights.Flights
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
@@ -10,6 +13,8 @@ interface AppRepository {
     fun getAllAirportStream(): Flow<List<Airport>>
 
     fun getAllFavoriteStream(): Flow<List<Favorite>>
+
+    fun getFlights(departureCode: String): Flow<List<Flights>>
 
     /**
      * Извлеките элемент из заданного источника данных, который соответствует [id].
@@ -22,9 +27,13 @@ interface AppRepository {
      * Вставить элемент в источник данных
      */
     suspend fun insertFavorite(favorite: Favorite)
+
+    suspend fun insertFlights(flights: Flights)
     /**
      * Удалить элемент из источника данных
      */
+    suspend fun deleteFlights(flights: Flights)
+
     suspend fun deleteFavorite(favorite: Favorite)
     /**
      * Обновить элемент в источнике данных

@@ -1,4 +1,4 @@
-package com.example.flightsearchapp.data.local
+package com.example.flightsearchapp.data.local.favorite
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

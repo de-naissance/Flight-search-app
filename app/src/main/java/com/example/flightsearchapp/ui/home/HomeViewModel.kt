@@ -2,7 +2,7 @@ package com.example.flightsearchapp.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flightsearchapp.data.local.Airport
+import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
