@@ -6,7 +6,6 @@ import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
 import com.example.flightsearchapp.data.local.flights.Flights
 import kotlinx.coroutines.flow.*
-import kotlin.random.Random
 
 class HomeViewModel(
     private val appRepository: AppRepository
@@ -20,20 +19,41 @@ class HomeViewModel(
             )
 
     /**
-     * Очищает, а затем заполняет таблицу случайными рейсами*/
+     * Очищает, а затем заполняет таблицу случайными рейсами
+     */
     suspend fun flightsGeneration() {
-        appRepository.getAllAirportStream().toList().random()
-        appRepository.insertFlights(
-            Flights(
-                departureCode = "SIUUU",
-                destinationCode = "СИУУУУУУУУУУУУ"
-            )
-        )
+        appRepository.deleteFlights() // Удаление сущестующих рейсов
 
+        val lst = homeUiState.value.airportList // Список айропортов
+
+        /**
+         * Достаём не повторяющийся код аэропорта
+         */
+        fun notRepeatingCode(_departureCode: String): String {
+            while (true) {
+                val destinationCode = lst.random().iataCode
+                if (_departureCode != destinationCode) return destinationCode
+            }
+        }
+
+        /**
+         * Заполняем 100 рейсов в БД [flights]
+         */
+        repeat(100) {
+            val departureCode = lst.random().iataCode
+            appRepository.insertFlights(
+                Flights(
+                    departureCode = departureCode,
+                    destinationCode = notRepeatingCode(departureCode)
+                )
+            )
+        }
     }
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
+
+
 
 data class HomeUiState(val airportList: List<Airport> = listOf())
