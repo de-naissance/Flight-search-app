@@ -1,10 +1,12 @@
 package com.example.flightsearchapp.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
 import com.example.flightsearchapp.data.local.flights.Flights
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 class HomeViewModel(
@@ -17,6 +19,44 @@ class HomeViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = HomeUiState()
             )
+
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
+
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
+
+
+    private val _airport = MutableStateFlow(homeUiState.value.airportList)
+
+    val airport = searchText
+        .debounce(1000L)
+        .onEach { _isSearching.update { true } }
+        .combine(_airport) { text, airport ->
+            if (text.isBlank()) {
+                airport
+            } else {
+                delay(2000L)
+                airport.filter {
+                    doesMatchSearchQuery(
+                        query = text,
+                        iataCode = it.iataCode,
+                        name = it.name
+                    )
+                }
+            }
+        }
+        .onEach { _isSearching.update { false } }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            _airport.value
+        )
+
+    fun onSearchTextChange(text: String) {
+        Log.i("Size_arr", _airport.value.size.toString())
+        _searchText.value = text
+    }
 
     /**
      * Очищает, а затем заполняет таблицу случайными рейсами
@@ -54,6 +94,20 @@ class HomeViewModel(
     }
 }
 
+private fun doesMatchSearchQuery(
+    query: String,
+    iataCode: String,
+    name: String
+): Boolean {
+    val matchingCombinations = listOf(
+        "$iataCode$name",
+        "$iataCode $name",
+        "${iataCode.first()} ${name.first()}",
+    )
 
+    return matchingCombinations.any {
+        it.contains(query, ignoreCase = true)
+    }
+}
 
 data class HomeUiState(val airportList: List<Airport> = listOf())
