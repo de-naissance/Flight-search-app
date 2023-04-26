@@ -1,10 +1,12 @@
 package com.example.flightsearchapp.ui.home
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
+import com.example.flightsearchapp.data.local.airport.AirportDao_Impl
 import com.example.flightsearchapp.data.local.flights.Flights
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -26,14 +28,13 @@ class HomeViewModel(
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
-
-    private val _airport = MutableStateFlow(homeUiState.value.airportList)
-
+    private val _airport = MutableStateFlow<List<Airport>>(listOf())
     val airport = searchText
         .debounce(1000L)
         .onEach { _isSearching.update { true } }
         .combine(_airport) { text, airport ->
             if (text.isBlank()) {
+                if (_airport.value.isEmpty()) _airport.update { homeUiState.value.airportList }
                 airport
             } else {
                 delay(2000L)
@@ -54,7 +55,7 @@ class HomeViewModel(
         )
 
     fun onSearchTextChange(text: String) {
-        Log.i("Size_arr", _airport.value.size.toString())
+        if (_airport.value.isEmpty()) _airport.update { homeUiState.value.airportList }
         _searchText.value = text
     }
 
@@ -65,6 +66,7 @@ class HomeViewModel(
         appRepository.deleteFlights() // Удаление сущестующих рейсов
 
         val lst = homeUiState.value.airportList // Список айропортов
+        //_airport = MutableStateFlow(lst)
 
         /**
          * Достаём не повторяющийся код аэропорта
