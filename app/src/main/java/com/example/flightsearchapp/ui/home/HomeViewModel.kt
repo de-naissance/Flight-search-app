@@ -1,12 +1,10 @@
 package com.example.flightsearchapp.ui.home
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
-import com.example.flightsearchapp.data.local.airport.AirportDao_Impl
+import com.example.flightsearchapp.data.local.favorite.Favorite
 import com.example.flightsearchapp.data.local.flights.Flights
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -14,12 +12,20 @@ import kotlinx.coroutines.flow.*
 class HomeViewModel(
     private val appRepository: AppRepository
 ) : ViewModel() {
-    val homeUiState: StateFlow<HomeUiState> =
+    val uiState: StateFlow<HomeUiState> =
         appRepository.getAllAirportStream().map { HomeUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = HomeUiState()
+            )
+
+    val favoriteUiState: StateFlow<FavoriteUiState> =
+        appRepository.getAllFavoriteStream().map { FavoriteUiState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = FavoriteUiState()
             )
 
     private val _searchText = MutableStateFlow("")
@@ -34,7 +40,7 @@ class HomeViewModel(
         .onEach { _isSearching.update { true } }
         .combine(_airport) { text, airport ->
             if (text.isBlank()) {
-                if (_airport.value.isEmpty()) _airport.update { homeUiState.value.airportList }
+                if (_airport.value.isEmpty()) _airport.update { uiState.value.airportList }
                 airport
             } else {
                 delay(2000L)
@@ -55,21 +61,20 @@ class HomeViewModel(
         )
 
     fun onSearchTextChange(text: String) {
-        if (_airport.value.isEmpty()) _airport.update { homeUiState.value.airportList }
+        if (_airport.value.isEmpty()) _airport.update { uiState.value.airportList }
         _searchText.value = text
     }
 
     /**
-     * Очищает, а затем заполняет таблицу случайными рейсами
+        Очищает, а затем заполняет таблицу случайными рейсами
      */
     suspend fun flightsGeneration() {
         appRepository.deleteFlights() // Удаление сущестующих рейсов
 
-        val lst = homeUiState.value.airportList // Список айропортов
-        //_airport = MutableStateFlow(lst)
+        val lst = uiState.value.airportList // Список айропортов
 
         /**
-         * Достаём не повторяющийся код аэропорта
+            Достаём не повторяющийся код аэропорта
          */
         fun notRepeatingCode(_departureCode: String): String {
             while (true) {
@@ -79,7 +84,7 @@ class HomeViewModel(
         }
 
         /**
-         * Заполняем 100 рейсов в БД [flights]
+            Заполняем 100 рейсов в БД [flights]
          */
         repeat(100) {
             val departureCode = lst.random().iataCode
@@ -96,6 +101,9 @@ class HomeViewModel(
     }
 }
 
+/**
+    Фильтрация поиского запроса на схожесть
+ */
 private fun doesMatchSearchQuery(
     query: String,
     iataCode: String,
@@ -113,3 +121,5 @@ private fun doesMatchSearchQuery(
 }
 
 data class HomeUiState(val airportList: List<Airport> = listOf())
+
+data class FavoriteUiState(val favoriteList: List<Favorite> = listOf())

@@ -25,9 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearchapp.R
-import com.example.flightsearchapp.data.local.airport.Airport
+import com.example.flightsearchapp.data.local.favorite.Favorite
 import com.example.flightsearchapp.ui.AppViewModelProvider
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,7 +34,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.homeUiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState() // Пока не трогать
+    val favoriteUiState by viewModel.favoriteUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val searchText by viewModel.searchText.collectAsState()
     val airport by viewModel.airport.collectAsState()
@@ -68,7 +68,6 @@ fun HomeScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
             OutlinedTextField(
                 value = searchText,
                 onValueChange = viewModel::onSearchTextChange,
@@ -101,14 +100,23 @@ fun HomeScreen(
                     }
                 }
             }
-
-            /*Text(text = "Пук-хрюк", modifier = modifier.padding(innerPadding))
-            LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(items = homeUiState.airportList) {item ->
-                    FlightCard(airportInfo = item, modifier = modifier
-                        .padding(innerPadding))
+            if (favoriteUiState.favoriteList.isEmpty()) {
+                Text(text = "Хрюк-пук")
+            } else {
+                LazyColumn(
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = favoriteUiState.favoriteList,
+                        key = { it.id }
+                    ) {
+                        Divider()
+                        ItCard(FavoriteInfo = it,
+                        modifier = modifier)
+                    }
                 }
-            }*/
+            }
         }
     }
 }
@@ -130,30 +138,12 @@ fun InputForm(
             .fillMaxWidth()
     ) {
         TODO()
-        /*OutlinedTextField(
-            value = "Код рейса",
-            onValueChange =,
-            label = { Text(text = "Код рейса") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )*/
     }
 }
-
-/*
-    OutlinedTextField(
-            value = itemUiState.name,
-            onValueChange = { onValueChange(itemUiState.copy(name = it)) },
-            label = { Text(stringResource(R.string.item_name_req)) },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = enabled,
-            singleLine = true
-        )
-        * */
 @Composable
-fun FlightCard(
+fun ItCard(
     modifier: Modifier = Modifier,
-    airportInfo: Airport
+    FavoriteInfo: Favorite
 ) {
     Card(
         modifier = modifier
@@ -161,12 +151,11 @@ fun FlightCard(
     ) {
         Column {
             Row {
-                Text(text = airportInfo.iataCode)
+                Text(text = FavoriteInfo.departureCode)
                 Spacer(modifier = modifier.width(10.dp))
-                Text(text = airportInfo.name)
+                Text(text = FavoriteInfo.destinationCode)
 
             }
-            Text(text = airportInfo.passengers.toString())
         }
 
     }

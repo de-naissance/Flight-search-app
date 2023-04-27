@@ -10,6 +10,9 @@ interface FlightsDao {
     @Query("DELETE FROM flights")
     suspend fun deleteFlights()
 
+    /**
+     * Фильтруем БД [flights] по коду вылета
+     */
     @Query("SELECT * from flights WHERE departure_code = :departureCode")
     fun getFlights(departureCode: String): Flow<List<Flights>>
 
