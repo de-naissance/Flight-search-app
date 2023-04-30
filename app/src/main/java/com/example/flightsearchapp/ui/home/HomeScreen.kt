@@ -1,5 +1,6 @@
 package com.example.flightsearchapp.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,13 +24,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.flightsearchapp.FlightSearchTopAppBar
 import com.example.flightsearchapp.R
+import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.favorite.Favorite
+import com.example.flightsearchapp.ui.navigation.NavigationDestination
 import com.example.flightsearchapp.ui.AppViewModelProvider
 import kotlinx.coroutines.launch
 
+object HomeDestination : NavigationDestination {
+    override val route = "home"
+    override val titleRes = R.string.app_name
+}
 @Composable
 fun HomeScreen(
+    navigateToFlightEntry: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -43,7 +51,10 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            AppTopBar(title = stringResource(id = R.string.app_name))
+            FlightSearchTopAppBar(
+                title = stringResource(HomeDestination.titleRes),
+                canNavigateBack = false
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -73,11 +84,11 @@ fun HomeScreen(
                 onValueChange = viewModel::onSearchTextChange,
                 label = null,
                 modifier = Modifier
+                    .padding(8.dp)
                     .fillMaxWidth(),
                 singleLine = true,
                 placeholder = { Text(text = "Название рейса")}
             )
-            Spacer(modifier = Modifier.height(16.dp))
             if(isSearching) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
@@ -89,19 +100,22 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .padding(8.dp)
                 ) {
                     items(airport) { airport ->
-                        Text(
-                            text = "${airport.iataCode} ${airport.name}",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp)
+                        SearchBox(
+                            airport = airport,
+                            onItemClick = { navigateToFlightEntry(it.id) }
                         )
                     }
                 }
             }
+
             if (favoriteUiState.favoriteList.isEmpty()) {
-                Text(text = "Хрюк-пук")
+                Text(
+                    text = "Хрюк-пук",
+                    modifier = modifier,
+                )
             } else {
                 LazyColumn(
                     modifier = modifier,
@@ -121,12 +135,26 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun AppTopBar(
-    title: String,
+fun SearchBox(
+    airport: Airport,
+    onItemClick: (Airport) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    TopAppBar(title = { Text(title) }, modifier = modifier)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onItemClick(airport) }
+    ) {
+        Divider()
+        Text(
+            text = "${airport.iataCode} ${airport.name}",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp)
+        )
+    }
 }
 
 @Composable
