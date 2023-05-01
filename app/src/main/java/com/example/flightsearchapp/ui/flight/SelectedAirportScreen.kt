@@ -1,5 +1,6 @@
 package com.example.flightsearchapp.ui.flight
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,9 @@ import com.example.flightsearchapp.ui.navigation.NavigationDestination
 
 object SelectedAirportDestination : NavigationDestination {
     override val route = "flight"
-    override val titleRes = R.string.app_name
+    override val titleRes = R.string.selectedAirport
+    const val itemIdArg = "itemId"
+    val routeWithArgs = "$route/{$itemIdArg}"
 }
 
 @Composable
@@ -30,14 +33,15 @@ fun SelectedAirportScreen(
     /**
      * На данный момент из-за этого ломается приложение
      */
-    //viewModel: SelectedAirportViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SelectedAirportViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    Log.e("navigateObject", "${SelectedAirportDestination.route}, ${SelectedAirportDestination.itemIdArg}, ${SelectedAirportDestination.routeWithArgs}")
     //val selectedAirportUiState by viewModel.selectedAirportUiState.collectAsState()
 
     Scaffold(
         topBar = {
             FlightSearchTopAppBar(
-                title = stringResource(HomeDestination.titleRes),
+                title = stringResource(SelectedAirportDestination.titleRes),
                 canNavigateBack = true,
                 navigateUp = navigateBack
             )

@@ -15,13 +15,15 @@ class SelectedAirportViewModel (
     savedStateHandle: SavedStateHandle,
     private val appRepository: AppRepository
 ) : ViewModel(){
-    private val departureCode:String = checkNotNull(savedStateHandle["itemId"]) // Пока не понял
+
+    private val departureCode: String =
+        checkNotNull(savedStateHandle[SelectedAirportDestination.itemIdArg])
 
     /**
      * Это вроде надо переделать!!!!!
      */
     val selectedAirportUiState: StateFlow<SelectedAirportUiState> =
-        appRepository.getFlights(departureCode)
+        appRepository.getFlights("VIA")
             .filterNotNull()
             .map { SelectedAirportUiState(it) }
             .stateIn(

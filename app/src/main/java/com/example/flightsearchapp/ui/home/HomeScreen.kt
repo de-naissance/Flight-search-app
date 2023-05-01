@@ -1,5 +1,6 @@
 package com.example.flightsearchapp.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,7 @@ object HomeDestination : NavigationDestination {
 }
 @Composable
 fun HomeScreen(
-    navigateToFlightEntry: (Int) -> Unit,
+    navigateToFlightEntry: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -105,7 +106,9 @@ fun HomeScreen(
                     items(airport) { airport ->
                         SearchBox(
                             airport = airport,
-                            onItemClick = { navigateToFlightEntry(it.id) }
+                            onItemClick = {
+                                navigateToFlightEntry(it.iataCode)
+                            }
                         )
                     }
                 }
