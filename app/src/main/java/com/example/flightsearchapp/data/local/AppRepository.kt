@@ -19,7 +19,7 @@ interface AppRepository {
     /**
      * Извлеките элемент из заданного источника данных, который соответствует [id].
      */
-    fun getAirportStream(id: Int): Flow<Airport>
+    fun getAirportStream(iataCode: String): Flow<Airport>
 
     fun getFavoriteStream(id: Int): Flow<Favorite>
 

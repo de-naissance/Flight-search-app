@@ -16,25 +16,28 @@ class SelectedAirportViewModel (
     private val appRepository: AppRepository
 ) : ViewModel(){
 
-    private val departureCode: String =
+    val departureCode: String =
         checkNotNull(savedStateHandle[SelectedAirportDestination.itemIdArg])
 
-    /**
-     * Это вроде надо переделать!!!!!
-     */
     val selectedAirportUiState: StateFlow<SelectedAirportUiState> =
-        appRepository.getFlights("VIA")
+        appRepository.getFlights(departureCode)
             .filterNotNull()
             .map { SelectedAirportUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue =SelectedAirportUiState()
+                initialValue = SelectedAirportUiState()
             )
 
+   fun airportInform(
+       iataCode: String
+   ) {
+       appRepository.getAirportStream(iataCode)
+           .map { it.name }
+   }
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
 
-data class SelectedAirportUiState(val favoriteList: List<Flights> = listOf())
+data class SelectedAirportUiState(val selectedAirportList: List<Flights> = listOf())
