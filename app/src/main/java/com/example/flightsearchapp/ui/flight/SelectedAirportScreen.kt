@@ -1,26 +1,35 @@
 package com.example.flightsearchapp.ui.flight
 
-import android.provider.Settings.Global.getString
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.IconToggleButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearchapp.FlightSearchTopAppBar
 import com.example.flightsearchapp.R
 import com.example.flightsearchapp.data.local.flights.Flights
 import com.example.flightsearchapp.ui.AppViewModelProvider
-import com.example.flightsearchapp.ui.flight.SelectedAirportDestination.itemIdArg
 import com.example.flightsearchapp.ui.navigation.NavigationDestination
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 object SelectedAirportDestination : NavigationDestination {
     override val route = "flight"
@@ -80,35 +89,63 @@ fun CardFlight(
     modifier: Modifier = Modifier,
     viewModel: SelectedAirportViewModel
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp)
-    ) {
+    val coroutineScope = rememberCoroutineScope()
+    var checked by remember { mutableStateOf(false) }
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .clickable {
+                coroutineScope.launch {
+                    viewModel.insertFavorite(flight)
+                }
+            },
+        backgroundColor = Color.LightGray,
 
-        Text(
-            text = stringResource(id = R.string.depart),
+    ) {
+        Column(
             modifier = modifier
-                .fillMaxWidth().padding(vertical = 8.dp)
-        )
-        Row {
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+        ) {
             Text(
-                text = flight.departureCode,
-                fontWeight = FontWeight.Bold
+                text = stringResource(id = R.string.depart),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             )
-            Spacer(modifier = modifier.width(10.dp))
-            Text(text = "Место отбытия")
-        }
-        Text(
-            text = stringResource(id = R.string.arrive),
-            modifier = modifier
-                .fillMaxWidth().padding(vertical = 8.dp)
-        )
-        Row {
+            Row {
+                Text(
+                    text = flight.departureCode,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = modifier.width(10.dp))
+                Text(text = viewModel.airportInform(flight.departureCode).collectAsState().value)
+            }
             Text(
-                text = flight.destinationCode,
-                fontWeight = FontWeight.Bold
+                text = stringResource(id = R.string.arrive),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             )
-            Spacer(modifier = modifier.width(10.dp))
-            Text(text = "Место прибытия")
+            Row {
+                Text(
+                    text = flight.destinationCode,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = modifier.width(10.dp))
+                Text(text = viewModel.airportInform(flight.destinationCode).collectAsState().value)
+            }
         }
+    }
+}
+
+@Composable
+fun FavoriteIcon(
+
+) {
+    IconToggleButton(checked = , onCheckedChange = ) {
+        
     }
 }
