@@ -19,7 +19,7 @@ class OfflineRepository(
 
     override fun getAirportStream(iataCode: String): Flow<Airport> = airportDao.getAirport(iataCode)
 
-    override fun getFavoriteStream(id: Int): Flow<Favorite> = favoriteDao.getAirport(id)
+    override fun getFavoriteFlight(id: Int): Flow<Favorite?> = favoriteDao.getFavoriteFlight(id)
 
     override fun getFlights(
         departureCode: String

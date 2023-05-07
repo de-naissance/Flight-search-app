@@ -47,6 +47,16 @@ class SelectedAirportViewModel (
                initialValue = ""
            )
    }
+    suspend fun checkAirport(
+        flightId:Int
+    ): Boolean {
+        val getFlight = appRepository.getFavoriteFlight(flightId)
+            .map { it?.id ?: 0 }
+            .stateIn(
+                scope = viewModelScope
+            )
+        return flightId == getFlight.value
+    }
 
     suspend fun insertFavorite(
         flights: Flights
@@ -56,9 +66,12 @@ class SelectedAirportViewModel (
         )
     }
 
-    suspend fun deleteFavorite() {
-        appRepository
+    suspend fun deleteFavorite(
+        flights: Flights
+    ) {
+        appRepository.deleteFavorite(flights.toFavorite())
     }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }

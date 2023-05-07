@@ -21,7 +21,7 @@ interface AppRepository {
      */
     fun getAirportStream(iataCode: String): Flow<Airport>
 
-    fun getFavoriteStream(id: Int): Flow<Favorite>
+    fun getFavoriteFlight(id: Int): Flow<Favorite?>
 
     /**
      * Вставить элемент в источник данных
