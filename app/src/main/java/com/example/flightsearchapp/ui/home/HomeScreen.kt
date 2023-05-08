@@ -1,6 +1,5 @@
 package com.example.flightsearchapp.ui.home
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -22,7 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearchapp.FlightSearchTopAppBar
@@ -31,6 +34,9 @@ import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.favorite.Favorite
 import com.example.flightsearchapp.ui.navigation.NavigationDestination
 import com.example.flightsearchapp.ui.AppViewModelProvider
+import com.example.flightsearchapp.ui.flight.FavoriteIcon
+import com.example.flightsearchapp.ui.flight.SelectedAirportViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object HomeDestination : NavigationDestination {
@@ -88,7 +94,7 @@ fun HomeScreen(
                     .padding(8.dp)
                     .fillMaxWidth(),
                 singleLine = true,
-                placeholder = { Text(text = "Название рейса")}
+                placeholder = { Text(text = stringResource(id = R.string.EnterAirport))}
             )
             if(isSearching) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -97,48 +103,46 @@ fun HomeScreen(
                     )
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(8.dp)
-                ) {
-                    items(airport) { airport ->
-                        SearchBox(
-                            airport = airport,
-                            onItemClick = {
-                                navigateToFlightEntry(it.iataCode)
-                            }
-                        )
-                    }
-                }
-            }
-
-            if (favoriteUiState.favoriteList.isEmpty()) {
-                Text(
-                    text = "Хрюк-пук",
-                    modifier = modifier,
-                )
-            } else {
-                LazyColumn(
-                    modifier = modifier,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = favoriteUiState.favoriteList,
-                        key = { it.id }
-                    ) {
-                        Divider()
-                        ItCard(FavoriteInfo = it,
-                        modifier = modifier)
-                    }
+                if (searchText.isEmpty() && favoriteUiState.favoriteList.isNotEmpty()) {
+                    SavedFavoriteAirport(
+                        modifier = modifier,
+                        favoriteUiState = favoriteUiState,
+                        viewModel = viewModel
+                    )
+                } else {
+                    SearchArea(
+                        navigateToFlightEntry = navigateToFlightEntry,
+                        airportList = airport,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchArea(
+    navigateToFlightEntry: (String) -> Unit,
+    airportList: List<Airport>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        items(airportList) { airport ->
+            SearchBox(
+                airport = airport,
+                onItemClick = {
+                    navigateToFlightEntry(it.iataCode)
+                }
+            )
+        }
+    }
+}
+
 @Composable
 fun SearchBox(
     airport: Airport,
@@ -150,44 +154,83 @@ fun SearchBox(
             .fillMaxWidth()
             .clickable { onItemClick(airport) }
     ) {
-        Divider()
-        Text(
-            text = "${airport.iataCode} ${airport.name}",
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 8.dp)
-        )
+                .padding(vertical = 6.dp, horizontal = 10.dp)
+        ) {
+            Text(
+                text = "${airport.iataCode} ",
+                fontWeight = FontWeight.Bold
+            )
+            Text(airport.name)
+
+        }
+        Divider()
     }
 }
-
 @Composable
-fun InputForm(
+fun SavedFavoriteAirport(
     modifier: Modifier = Modifier,
+    favoriteUiState: FavoriteUiState,
+    viewModel: HomeViewModel
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        TODO()
+        items(
+            items = favoriteUiState.favoriteList,
+            key = { it.id }
+        ) {
+            ItCard(
+                FavoriteInfo = it,
+                modifier = modifier,
+                viewModel = viewModel
+            )
+        }
     }
 }
 @Composable
 fun ItCard(
     modifier: Modifier = Modifier,
-    FavoriteInfo: Favorite
+    FavoriteInfo: Favorite,
+    viewModel: HomeViewModel
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .padding(horizontal = 6.dp, vertical = 5.dp)
+            .clip(RoundedCornerShape(10.dp)),
+        backgroundColor = Color.Transparent,
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+            Text(
+                text = stringResource(id = R.string.depart), modifier.padding(vertical = 6.dp)
+            )
             Row {
-                Text(text = FavoriteInfo.departureCode)
-                Spacer(modifier = modifier.width(10.dp))
-                Text(text = FavoriteInfo.destinationCode)
-
+                Text(
+                    text = FavoriteInfo.departureCode,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = viewModel.airportInform(FavoriteInfo.departureCode).collectAsState().value)
+            }
+            Text(
+                text = stringResource(id = R.string.arrive),
+                modifier = modifier.padding(vertical = 6.dp)
+            )
+            Row(modifier.padding(bottom = 8.dp)) {
+                Text(
+                    text = FavoriteInfo.destinationCode,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = viewModel.airportInform(FavoriteInfo.destinationCode).collectAsState().value)
             }
         }
-
     }
 }

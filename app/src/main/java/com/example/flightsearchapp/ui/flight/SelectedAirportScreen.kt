@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -51,7 +52,6 @@ fun SelectedAirportScreen(
     viewModel: SelectedAirportViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val selectedAirportUiState by viewModel.selectedAirportUiState.collectAsState()
-    val iata = viewModel.airportInform(viewModel.departureCode)
     Scaffold(
         topBar = {
             FlightSearchTopAppBar(
@@ -96,10 +96,11 @@ fun CardFlight(
     viewModel: SelectedAirportViewModel
 ) {
     val coroutineScope = rememberCoroutineScope()
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 6.dp, vertical = 8.dp)
+            .padding(horizontal = 6.dp, vertical = 5.dp)
             .clip(RoundedCornerShape(10.dp))
             .clickable {
                 coroutineScope.launch(Dispatchers.IO) {
@@ -107,45 +108,42 @@ fun CardFlight(
                 }
             },
         backgroundColor = Color.Transparent,
-
     ) {
         Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 6.dp),
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 6.dp),
         ) {
-            Row(modifier.fillMaxWidth()) {
+            Row(
+                modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = stringResource(id = R.string.depart),
-                    modifier = modifier
-                        .padding(vertical = 8.dp)
                 )
                 FavoriteIcon(
                     flight = flight,
-                    modifier = modifier,
                     viewModel = viewModel
                 )
             }
-            Row {
+            Row(modifier.padding(bottom = 8.dp)) {
                 Text(
                     text = flight.departureCode,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(text = viewModel.airportInform(flight.departureCode).collectAsState().value)
             }
             Text(
                 text = stringResource(id = R.string.arrive),
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                modifier = Modifier.padding(bottom = 7.dp)
             )
-            Row {
+            Row(modifier.padding(bottom = 8.dp)) {
                 Text(
                     text = flight.destinationCode,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(text = viewModel.airportInform(flight.destinationCode).collectAsState().value)
             }
         }
@@ -156,7 +154,6 @@ fun CardFlight(
 @Composable
 fun FavoriteIcon(
     flight: Flights,
-    modifier: Modifier = Modifier,
     viewModel: SelectedAirportViewModel
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -188,7 +185,7 @@ fun FavoriteIcon(
         /**
          * Возможно, стоит в дальнейшём вынести эту иконку в [res], чтобы не нагружать приложение
          */
-        Icon(Icons.Filled.Bookmark, contentDescription = "Localized description", tint = tint)
+        Icon(Icons.Filled.Bookmark, contentDescription = "Bookmark", tint = tint)
     }
 }
 

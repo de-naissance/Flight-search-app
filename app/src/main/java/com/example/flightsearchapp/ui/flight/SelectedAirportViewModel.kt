@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 class SelectedAirportViewModel (
     savedStateHandle: SavedStateHandle,
     private val appRepository: AppRepository
-) : ViewModel(){
+) : ViewModel() {
 
     val departureCode: String =
         checkNotNull(savedStateHandle[SelectedAirportDestination.itemIdArg])

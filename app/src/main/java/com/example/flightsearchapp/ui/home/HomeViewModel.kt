@@ -66,6 +66,21 @@ class HomeViewModel(
     }
 
     /**
+     * Запросить название аэропорта
+     */
+    fun airportInform(
+        iataCode: String
+    ): StateFlow<String> {
+        return appRepository.getAirportStream(iataCode)
+            .map { it.name }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = ""
+            )
+    }
+
+    /**
         Очищает, а затем заполняет таблицу случайными рейсами
      */
     suspend fun flightsGeneration() {
