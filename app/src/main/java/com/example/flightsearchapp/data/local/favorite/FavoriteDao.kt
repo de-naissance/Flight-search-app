@@ -14,6 +14,9 @@ interface FavoriteDao {
     @Delete
     suspend fun delete(favorite: Favorite)
 
+    @Query("DELETE FROM favorite")
+    suspend fun deleteAllFavorite()
+
     @Query("SELECT * from favorite WHERE id = :id")
     fun getFavoriteFlight(id: Int): Flow<Favorite?>
 

@@ -17,7 +17,7 @@ interface AppRepository {
     fun getFlights(departureCode: String): Flow<List<Flights>>
 
     /**
-     * Извлеките элемент из заданного источника данных, который соответствует [id].
+     * Извлеките элемент из заданного источника данных, который соответствует id.
      */
     fun getAirportStream(iataCode: String): Flow<Airport>
 
@@ -35,8 +35,6 @@ interface AppRepository {
     suspend fun deleteFlights()
 
     suspend fun deleteFavorite(favorite: Favorite)
-    /**
-     * Обновить элемент в источнике данных
-     */
-    suspend fun updateFavorite(favorite: Favorite)
+
+    suspend fun deleteAllFavorite()
 }

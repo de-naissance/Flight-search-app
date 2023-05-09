@@ -87,6 +87,7 @@ class HomeViewModel(
      */
     suspend fun flightsGeneration() {
         appRepository.deleteFlights() // Удаление сущестующих рейсов
+        appRepository.deleteAllFavorite()
 
         val lst = uiState.value.airportList // Список айропортов
 

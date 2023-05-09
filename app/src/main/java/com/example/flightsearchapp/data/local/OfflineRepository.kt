@@ -32,7 +32,6 @@ class OfflineRepository(
     override suspend fun insertFlights(flights: Flights) = flightsDao.insert(flights)
 
     override suspend fun deleteFlights() = flightsDao.deleteFlights()
-    override suspend fun updateFavorite(favorite: Favorite) {
-        TODO("Not yet implemented")
-    }
+
+    override suspend fun deleteAllFavorite() = favoriteDao.deleteAllFavorite()
 }
