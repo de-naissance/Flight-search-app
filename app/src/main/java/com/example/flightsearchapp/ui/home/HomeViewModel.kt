@@ -6,6 +6,7 @@ import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.AppRepository
 import com.example.flightsearchapp.data.local.favorite.Favorite
 import com.example.flightsearchapp.data.local.flights.Flights
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
@@ -35,6 +36,7 @@ class HomeViewModel(
     val isSearching = _isSearching.asStateFlow()
 
     private val _airport = MutableStateFlow<List<Airport>>(listOf())
+    @OptIn(FlowPreview::class)
     val airport = searchText
         .debounce(1000L)
         .onEach { _isSearching.update { true } }
@@ -99,7 +101,7 @@ class HomeViewModel(
         }
 
         /**
-            Заполняем 100 рейсов в БД [flights]
+            Заполняем 100 рейсов в БД [Flights]
          */
         repeat(100) {
             val departureCode = lst.random().iataCode

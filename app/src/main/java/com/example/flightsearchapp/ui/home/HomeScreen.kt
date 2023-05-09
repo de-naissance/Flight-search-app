@@ -1,5 +1,6 @@
 package com.example.flightsearchapp.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,9 +42,6 @@ import com.example.flightsearchapp.data.local.airport.Airport
 import com.example.flightsearchapp.data.local.favorite.Favorite
 import com.example.flightsearchapp.ui.navigation.NavigationDestination
 import com.example.flightsearchapp.ui.AppViewModelProvider
-import com.example.flightsearchapp.ui.flight.FavoriteIcon
-import com.example.flightsearchapp.ui.flight.SelectedAirportViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object HomeDestination : NavigationDestination {
@@ -75,7 +80,6 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Generate flights",
-                    tint = MaterialTheme.colors.onPrimary
                 )
             }
         }
@@ -83,7 +87,8 @@ fun HomeScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.background),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedTextField(
@@ -94,7 +99,7 @@ fun HomeScreen(
                     .padding(8.dp)
                     .fillMaxWidth(),
                 singleLine = true,
-                placeholder = { Text(text = stringResource(id = R.string.EnterAirport))}
+                placeholder = { Text(text = stringResource(id = R.string.EnterAirport))},
             )
             if(isSearching) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -202,7 +207,6 @@ fun ItCard(
             .fillMaxWidth()
             .padding(horizontal = 6.dp, vertical = 5.dp)
             .clip(RoundedCornerShape(10.dp)),
-        backgroundColor = Color.Transparent,
     ) {
         Column(
             modifier = Modifier
