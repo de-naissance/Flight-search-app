@@ -42,3 +42,8 @@ Flight search имеет три локальные базы данных:
 | Int | String | String |
 
 # Скриншоты
+
+<img src="Screenshot/screenshots.png"/>
+![Screenshot_20230509_134122](https://github.com/de-naissance/Flight-search-app/assets/90140295/650b64cc-b279-4411-a61d-e511db1af75b)
+![Screenshot_20230509_134155](https://github.com/de-naissance/Flight-search-app/assets/90140295/eaeb7eae-d1db-45fd-97df-c95ca6798000)
+
