@@ -2,7 +2,7 @@
 
 Flight search - это приложение для поиска авиарейсов, в котором пользователи вводят информацию об аэропорте и могут просматривать список пунктов назначения, используя этот аэропорт в качестве пункта отправления. 
 
-В приложение демонстирует использование:
+В приложение демонстрирует использование:
 * Библиотеки Room для работы с БД
 * OutlinedTextField с фильтром результата поиска
 * ViewModel
@@ -43,7 +43,10 @@ Flight search имеет три локальные базы данных:
 
 # Скриншоты
 
-<img src="Screenshot/screenshots.png"/>
-![Screenshot_20230509_134122](https://github.com/de-naissance/Flight-search-app/assets/90140295/650b64cc-b279-4411-a61d-e511db1af75b)
-![Screenshot_20230509_134155](https://github.com/de-naissance/Flight-search-app/assets/90140295/eaeb7eae-d1db-45fd-97df-c95ca6798000)
+Светлая тема:
 
+<img src="Screenshot/Screenshot2.png"/>
+
+Тёмная тема:
+
+<img src="Screenshot/Screenshot1.png" width="500">
